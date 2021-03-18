@@ -1,0 +1,17 @@
+{
+  "name": "clientbatchingestapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cassandra-driver": "^4.6.1",
+    "csv-parse": "^4.15.3",
+    "dotenv": "^8.2.0"
+  }
+}
