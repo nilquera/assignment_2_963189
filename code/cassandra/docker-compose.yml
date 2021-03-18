@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+  cas1:
+    image: cassandra:latest
+    container_name: cas1
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=coremds
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=europe-north1
+      - CASSANDRA_RACK=1
+      - CASSANDRA_SEEDS=cas1, cas3
+  cas2:
+    image: cassandra:latest
+    container_name: cas2
+    ports:
+      - "9043:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=coremds
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=europe-north1
+      - CASSANDRA_RACK=2
+      - CASSANDRA_SEEDS=cas1, cas3
+  cas3:
+    image: cassandra:latest
+    container_name: cas3
+    ports:
+      - "9044:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=coremds
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=europe-west1
+      - CASSANDRA_RACK=1
+      - CASSANDRA_SEEDS=cas1, cas3
+  cas4:
+    image: cassandra:latest
+    container_name: cas4
+    ports:
+      - "9045:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=coremds
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=europe-west1
+      - CASSANDRA_RACK=2
+      - CASSANDRA_SEEDS=cas1, cas3
