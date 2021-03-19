@@ -19,23 +19,49 @@ const filterUploadable = require("./helpers/filterUploadable");
 const parseHrtimeToSeconds = require("./helpers/parseHrtimeToSeconds");
 const { getFileArraySize } = require("./helpers/getFileSize");
 const { fork } = require("child_process");
-require("dotenv").config();
+const config = require("./tenant.json");
 
 const logger = winston.createLogger({
   level: "info",
-  format: winston.format.json(),
+  format: winston.format.combine(
+    winston.format.timestamp({
+      format: "YYYY-MM-DD HH:mm:ss",
+    }),
+    winston.format.errors({ stack: true }),
+    winston.format.splat(),
+    winston.format.json()
+  ),
   defaultMeta: { service: "batchingestmanager" },
   transports: [
-    new winston.transports.File({ filename: "error.log", level: "error" }),
-    new winston.transports.File({ filename: "combined.log" }),
+    new winston.transports.File({ filename: "log/error.log", level: "error" }),
+    new winston.transports.File({ filename: "log/combined.log" }),
   ],
 });
 
-fs.readdir(process.env.CLIENT_STAGING_INPUT_DIRECTORY, function (err, files) {
+if (process.env.NODE_ENV !== "production") {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      ),
+    })
+  );
+}
+
+fs.readdir(config.client_staging_input_directory, function (err, files) {
   if (err) {
     if (err.errno == -2) {
-      console.error("Directory not found");
-    } else console.error("Unknown error when reading the directory");
+      logger.log({
+        level: "error",
+        message: "CSVs directory not found",
+      });
+    } else {
+      logger.log({
+        level: "error",
+        message: "Unknown error when opening CSVs directory",
+      });
+    }
   } else {
     if (files.length) {
       let csvsFound = false;
@@ -47,22 +73,25 @@ fs.readdir(process.env.CLIENT_STAGING_INPUT_DIRECTORY, function (err, files) {
       }
       if (csvsFound) {
         const fullPathFiles = files.map((file) =>
-          path.join(`${process.env.CLIENT_STAGING_INPUT_DIRECTORY}`, file)
+          path.join(`${config.client_staging_input_directory}`, file)
         );
 
-        // Depending on process.env.PROFILE, maybe not all files can be uploaded
+        // Depending on config.profile, maybe not all files can be uploaded
         const filesToUpload = filterUploadable(fullPathFiles);
 
         runIngestion(filesToUpload);
       }
     } else {
-      console.log("Directory empty");
+      logger.log({
+        level: "warn",
+        message: "CSVs directory is empty",
+      });
     }
   }
 });
 
 const runIngestion = (files) => {
-  var dir = path.join(process.env.CLIENT_STAGING_INPUT_DIRECTORY, "../.tmp");
+  var dir = path.join(config.client_staging_input_directory, "../.tmp");
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
@@ -71,7 +100,7 @@ const runIngestion = (files) => {
     time: new Date(),
   };
 
-  const appPath = process.env.CLIENTBATCHINGESTAPP_PATH;
+  const appPath = config.clientbatchingestapp_path;
   const startTime = process.hrtime();
   const n = fork(appPath, files);
 
@@ -84,14 +113,28 @@ const runIngestion = (files) => {
       Math.round(getFileArraySize(m.uploadedFiles) * 1000) / 1000;
     log.dataSize = uploadedMB;
 
-    console.log(log);
-
-    console.log("[Info] Uploaded MB: ", uploadedMB);
+    logger.log({
+      level: log.status === "success" ? "info" : "error",
+      message: "CSV(s) ingested",
+      ...log,
+    });
 
     // Move file to a temp directory
     for (file of m.uploadedFiles) {
       fs.rename(file, path.join(dir, path.basename(file)), (err) => {
-        if (err) console.error(err);
+        if (err) {
+          logger.log({
+            level: "error",
+            message: "Error when moving CSV to tmp directory",
+            error: err,
+            file,
+          });
+        }
+      });
+      logger.log({
+        level: "info",
+        message: "CSV moved to tmp directory",
+        file,
       });
     }
   });

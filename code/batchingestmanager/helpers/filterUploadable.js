@@ -1,8 +1,8 @@
 const { getFileSize } = require("./getFileSize");
-require("dotenv").config();
+const config = require("../tenant.json");
 
 module.exports = (files) => {
-  const profile = process.env.PROFILE;
+  const profile = config.profile;
   let maxSize;
   switch (profile) {
     case "s":

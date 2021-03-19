@@ -26,7 +26,7 @@ As a result, every tenant will be limited to his profile constraints. The used b
     "description": "Configuration for clientbatchingestapp",
     "type": "object",
     "properties": {
-        "tenantId": {
+        "tenant_id": {
             "description": "id of the tenant using the clientbatchingestapp",
             "type": "integer"
         },
@@ -35,9 +35,25 @@ As a result, every tenant will be limited to his profile constraints. The used b
             "type": "string",
             "enum": ["s", "m", "l"]
         },
-        "clientbatchingestappPath": {
+        "clientbatchingestapp_path": {
             "description": "full path of the clientbatchingestapp folder which contains the script responsible of uploading files into mysimbdp.",
             "type": "string",
+        },
+        "client_staging_input_directory" : {
+            "description": "full path of the directory where CSVs are dropped by ruuvitags",
+            "type": "string"
+        },
+        "ingest_hour": {
+            "description": "hour to run the ingestion process",
+            "type": "integer",
+            "maximum": 24,
+            "minimum": 0
+        },
+        "ingest_minute": {
+            "description": "minute to run the ingestion process",
+            "type": "integer",
+            "maximum": 59,
+            "minimum": 0
         }
     }
 }
@@ -46,9 +62,12 @@ As a result, every tenant will be limited to his profile constraints. The used b
 An example configuration could be the following one.
 ```json
 {
-    "tenantId": 12345,
+    "tenant_id": 12345,
     "profile": "s",
-    "clientbatchingestappPath": "/opt/mysimbdp/clientbatchingestapp"
+    "clientbatchingestapp_path": "/opt/mysimbdp/clientbatchingestapp",
+    "client_staging_input_directory": "/opt/mysimbdp/client_staging_input_directory",
+    "ingest_hour": 12,
+    "ingest_minute": 0
 }
 ```
 
@@ -83,8 +102,6 @@ It performs the following tasks every time it is run:
 In my previous assignment, mysimbdp-coredms had the metrics table where all data is stored. In this assignment, I will create a common database for basic users and allow specific users to request their own databases. They can even decide the size of their storage (with some limitations) and the partitioning and replication strategies. Of course, this would be subject to the extra costs. We would need to create tenant plans based on how much storage, partitioning and replication they want.
 
 Also, there would be a small database dedicated to tenant management. An API in mysimbdp-daas would allow tenants to authenticate first. Any further communication between the tenant and mysimbdb-coredms (to upload files) would request a valid authorization token.
-
-TESTS
 
 **5. Implement and provide logging features for capturing successful/failed ingestion as well as metrics about ingestion time, data size, etc., for files which have been ingested into mysimbdp. Logging information must be stored in separate files, databases or a monitoring system for analytics of ingestion. Provide and show simple statistical data extracted from logs for individual tenants and for the whole platform with your tests. (1 point)**
 
