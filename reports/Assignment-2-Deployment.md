@@ -46,7 +46,9 @@ Tips:
 
 ### Clientbatchingestapp
 
-We provide a clientbatchingestapp example ready to be used, but we encourage tenants to write their own scripts. 
+We provide a clientbatchingestapp example ready to be used, but we encourage tenants to write their own scripts.
+
+IMPORTANT: create a client-staging-input-directory where all CSVs will be dropped by IoT devices (ruuvitags). For testing purposes, you can download example files at [data directory](../data) and move them to client-staging-input-directory. Simply run [download.sh](../data/download.sh) to fetch the CSVs from the official repository.
 
 Any clientbatchingestapp must follow the next requirements:
 

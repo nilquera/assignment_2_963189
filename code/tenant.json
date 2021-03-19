@@ -1,5 +1,0 @@
-{
-    "tenantId": 12345,
-    "clientbatchingestappPath": "/opt/mysimbdp/clientbatchingestapp",
-    "profile": "m"
-}
