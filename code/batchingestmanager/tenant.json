@@ -1,9 +1,0 @@
-{
-  "tenant_id": 12345,
-  "profile": "s",
-  "clientbatchingestapp_path":
-    "/home/nilquera/Documents/Aalto/Big Data Platforms/assignment_2_963189/code/clientbatchingestapp/index.js",
-  "client_staging_input_directory": "/home/nilquera/Documents/Aalto/Big Data Platforms/assignment_2_963189/code/batchingestmanager/client-staging-input-directory",
-  "ingest_hour": 12,
-  "ingest_minute": 0
-}
