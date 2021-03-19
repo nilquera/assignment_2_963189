@@ -3,28 +3,28 @@ const parse = require("csv-parse/lib/sync");
 const Lock = require("./lock");
 const cassandra = require("cassandra-driver");
 const executeConcurrent = cassandra.concurrent.executeConcurrent;
-require("dotenv").config();
+const config = require("./config.json");
 
 const files = process.argv.slice(2);
 
 const client = new cassandra.Client({
-  contactPoints: [process.env.COREDMS_NODE1, process.env.COREDMS_NODE2],
-  localDataCenter: process.env.COREDMS_LOCAL_DATACENTER,
+  contactPoints: [config.coredms_node1, config.coredms_node2],
+  localDataCenter: config.coredms_local_datacenter,
   keyspace: "coredms",
 });
 
 let uploadedFiles = [];
 (async () => {
   const concurrencyLevel =
-    process.env.INGESTION_CONCURRENCY_LEVEL > 2048
+    config.ingestion_concurrency_level > 2048
       ? 2048
-      : process.env.INGESTION_CONCURRENCY_LEVEL;
+      : config.ingestion_concurrency_level;
 
   for (file of files) {
     const content = await fs.readFile(file);
     const records = parse(content, {
-      columns: process.env.CSV_COLUMNS ? true : false,
-      delimiter: process.env.CSV_SEPARATOR,
+      columns: config.csv_columns ? true : false,
+      delimiter: config.csv_separator,
     });
 
     const values = records.map((record) => {

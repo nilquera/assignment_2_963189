@@ -1,0 +1,10 @@
+{
+    "csv_separator": ",",
+    "csv_rootdir": "../../data/",
+    "csv_columns": 1,
+    "csv_watch_interval": 1,
+    "coredms_node1": "172.22.0.2",
+    "coredms_node2": "172.22.0.3",
+    "coredms_local_datacenter": "europe-north1",
+    "ingestion_concurrency_level": 5
+}
